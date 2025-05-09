@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Netbank Főoldal</title>
+    <link rel="stylesheet" href="/static.css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0077cc;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        main {
+            padding: 2rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .btn {
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #005fa3;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Netbank</h1>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn">Kijelentkezés</button>
+    </form>
+</header>
+<main>
+    <div class="card">
+        <h2>Üdvözlünk, <span th:text="${user.username}">Felhasználó</span>!</h2>
+        <p><strong>Számlaszám:</strong> <span th:text="${user.accountNumber}">HU1234567890</span></p>
+        <p><strong>Egyenleg:</strong> <span th:text="${#numbers.formatDecimal(user.accountBalance, 1, 'COMMA', 2, 'POINT')}"></span> Ft</p>
+        <form th:action="@{/account}" method="get">
+            <button class="btn">Számlakezelés</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Legutóbbi tranzakciók</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Dátum</th>
+                <th>Típus</th>
+                <th>Összeg</th>
+                <th>Leírás</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tx : ${transactions}">
+                <td th:text="${#temporals.format(tx.date, 'yyyy-MM-dd HH:mm')}">2025-05-09 12:00</td>
+                <td th:text="${tx.type}">deposit</td>
+                <td th:text="${tx.amount}">1000</td>
+                <td th:text="${tx.description}">leírás</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<footer>
+    &copy; 2025 Netbank rendszer
+</footer>
+</body>
+</html>

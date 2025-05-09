@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Regisztráció</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .register-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn {
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #005fa3;
+        }
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #0077cc;
+            text-decoration: none;
+        }
+        .login-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <h1>Regisztráció</h1>
+    <form th:action="@{/register}" method="post" th:object="${user}">
+        <label>
+            Felhasználónév:
+            <input type="text" th:field="*{username}" required />
+        </label>
+        <label>
+            Jelszó:
+            <input type="password" th:field="*{password}" required />
+        </label>
+        <button type="submit" class="btn">Regisztrálok</button>
+    </form>
+    <a th:href="@{/login}" class="login-link">Vissza a bejelentkezéshez</a>
+</div>
+</body>
+</html>

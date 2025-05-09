@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tranzakció szerkesztése</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .edit-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-top: 1rem;
+        }
+        input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn {
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #005fa3;
+        }
+        .link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #0077cc;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="edit-container">
+    <h1>Tranzakció időpontjának módosítása</h1>
+    <form th:action="@{/updateTransaction}" method="post">
+        <input type="hidden" name="transactionId" th:value="${transaction.id}"/>
+
+        <label>Új dátum:</label>
+        <input type="date" name="date" th:value="${#temporals.format(transaction.scheduledDate, 'yyyy-MM-dd')}"/>
+
+        <label>Óra:</label>
+        <input type="number" name="hour" min="0" max="23"
+               th:value="${#temporals.format(transaction.scheduledDate, 'HH')}"/>
+
+        <label>Perc:</label>
+        <input type="number" name="minute" min="0" max="59"
+               th:value="${#temporals.format(transaction.scheduledDate, 'mm')}"/>
+
+        <button type="submit" class="btn">Mentés</button>
+    </form>
+
+    <a th:href="@{/account}" class="link">Vissza a számlához</a>
+</div>
+</body>
+</html>

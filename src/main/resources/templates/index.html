@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Netbank Kezdőlap</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0077cc;
+            margin-bottom: 1rem;
+        }
+        p {
+            color: #333;
+            margin-bottom: 2rem;
+        }
+        .btn {
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        .btn:hover {
+            background-color: #005fa3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Üdvözlünk a Netbank rendszerben</h1>
+    <p>Biztonságos online banki szolgáltatások gyorsan és egyszerűen.</p>
+    <a th:href="@{/login}" class="btn">Bejelentkezés</a>
+    <a th:href="@{/register}" class="btn">Regisztráció</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Számlakezelés</title>
+    <link rel="stylesheet" href="/static.css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0077cc;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        main {
+            padding: 2rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .btn {
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #005fa3;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Számlakezelés</h1>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn">Kijelentkezés</button>
+    </form>
+</header>
+<main>
+    <div class="card">
+        <h2>Felhasználói adatok</h2>
+        <p><strong>Felhasználónév:</strong> <span th:text="${user.username}">username</span></p>
+        <p><strong>Számlaszám:</strong> <span th:text="${user.accountNumber}">HU1234567890</span></p>
+        <p><strong>Egyenleg:</strong> <span th:text="${user.accountBalance}">0.0</span> Ft</p>
+    </div>
+
+    <div class="card">
+        <h2>Pénz feltöltése</h2>
+        <form th:action="@{/deposit}" method="post">
+            <input type="number" step="0.01" name="amount" required/>
+            <button type="submit" class="btn">Feltöltés</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Pénz levétele</h2>
+        <form th:action="@{/withdraw}" method="post">
+            <input type="number" step="0.01" name="amount" required/>
+            <button type="submit" class="btn">Kivét</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Pénz átutalás</h2>
+        <form th:action="@{/transfer}" method="post">
+            <label>Számlaszám:</label>
+            <input type="text" name="targetAccountNumber" required/>
+            <label>Összeg:</label>
+            <input type="number" step="0.01" name="amount" required/><br/>
+            <label>Ütemezett dátum:</label>
+            <input type="date" name="date"/>
+            <label>Óra:</label>
+            <input type="number" name="hour" min="0" max="23"/>
+            <label>Perc:</label>
+            <input type="number" name="minute" min="0" max="59"/>
+            <button type="submit" class="btn">Utalás</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Ütemezett átutalások</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Dátum és idő</th>
+                <th>Összeg</th>
+                <th>Leírás</th>
+                <th>Műveletek</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tx : ${scheduledTransactions}">
+                <td th:text="${#temporals.format(tx.scheduledDate, 'yyyy-MM-dd HH:mm')}">2025-05-15 10:00</td>
+                <td th:text="${tx.amount}">1000</td>
+                <td th:text="${tx.description}">leírás</td>
+                <td>
+                    <form th:action="@{/editTransaction}" method="get" style="display:inline">
+                        <input type="hidden" name="transactionId" th:value="${tx.id}"/>
+                        <button type="submit" class="btn">Szerkesztés</button>
+                    </form>
+                    <form th:action="@{/cancelTransaction}" method="post" style="display:inline">
+                        <input type="hidden" name="transactionId" th:value="${tx.id}"/>
+                        <button type="submit" class="btn">Törlés</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="text-align: center;">
+        <a th:href="@{/home}" class="btn">Vissza a főoldalra</a>
+    </div>
+</main>
+<footer>
+    &copy; 2025 Netbank rendszer
+</footer>
+</body>
+</html>
