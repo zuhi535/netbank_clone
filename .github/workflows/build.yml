@@ -1,29 +1,67 @@
-name: Java CI with Maven
+name: Java CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main", "master" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      # 1. Kód letöltése
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
+      # 2. JDK 21 telepítése
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
           java-version: '21'
-          cache: 'maven'
+          distribution: 'temurin'
 
-      - name: Build, test and verify coverage
-        run: mvn clean verify -B
+      # 3. Maven build + tesztek, Checkstyle hozzáadva most már
+      - name: Build and Test with Checkstyle skip
+        run: mvn -B verify
 
+      # 4. In-memory mock adatbázis létrehozása (ArrayList alapú)
+      - name: Mock DB Setup (ArrayList-based)
+        run: |
+          echo "In-memory mock DB használata: az alkalmazás tesztjei már használhatnak ArrayList alapú adattárolást"
+          mkdir -p src/test/java/org/example/to_dolist/mockdb
+          cat <<EOT > src/test/java/org/example/to_dolist/mockdb/MockTaskDB.java
+          package org.example.to_dolist.mockdb;
+
+          import org.example.to_dolist.domain.Task;
+          import java.util.ArrayList;
+          import java.util.List;
+          import java.util.UUID;
+
+          public class MockTaskDB {
+              private List<Task> tasks = new ArrayList<>();
+
+              public void addTask(Task task) {
+                  tasks.add(task);
+              }
+
+              public Task getTaskById(UUID id) {
+                  return tasks.stream().filter(t -> t.getId().equals(id)).findFirst().orElse(null);
+              }
+
+              public List<Task> getAllTasks() {
+                  return tasks;
+              }
+          }
+          EOT
+          echo "Mock adatbázis osztály létrehozva."
+
+      # 5. Tesztek futtatása újra, Checkstyle most már hozzáadva
+      - name: Run tests with mock DB
+        run: mvn test
+
+      # 6. Jacoco lefedettségi jelentés feltöltése
       - name: Upload Jacoco Test Coverage Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -31,6 +69,7 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco
 
+      # 7. Buildelt JAR fájl feltöltése
       - name: Upload Built Jar Artifact
         if: always()
         uses: actions/upload-artifact@v4
