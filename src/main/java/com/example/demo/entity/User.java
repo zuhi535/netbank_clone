@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchConnectionDetails;
 
 @Entity
 @Getter
@@ -28,6 +29,7 @@ public class User {
 
     @Column(nullable = false)
     private Double accountBalance;
+
 
     public void setPassword(String password) {
         this.password = password;
@@ -67,5 +69,13 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import jdk.jshell.Snippet;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -29,6 +30,7 @@ public class Transaction {
 
     @ManyToOne
     private User user;
+
 
     public void setUser(User user) {
         this.user = user;
@@ -84,5 +86,13 @@ public class Transaction {
 
     public LocalDateTime getDate() {
         return date;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
     }
 }
