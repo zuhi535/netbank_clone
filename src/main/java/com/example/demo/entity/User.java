@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchConnect
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users") // Fontos: ne legyen "user", mert SQL kulcsszó!
+@Table(name = "users")
 public class User {
 
     @Id
