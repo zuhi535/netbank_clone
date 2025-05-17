@@ -33,13 +33,6 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Regisztrált felhasználó adatainak mentése:
-     * - Jelszó bcrypt kódolása
-     * - Alapértelmezett szerepkör beállítása
-     * - Számlaszám generálása
-     * - Kezdeti egyenleg nullázása
-     */
     public void saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("USER");
@@ -54,10 +47,6 @@ public class UserService implements UserDetailsService {
                 .toUpperCase();
     }
 
-    /**
-     * Egyszerű feltöltés a felhasználó számlájára.
-     * Hibás (<=0) összeget eldobjuk.
-     */
     public void deposit(String username, double amount) {
         if (amount <= 0) return;
 
@@ -68,9 +57,6 @@ public class UserService implements UserDetailsService {
                 LocalDateTime.now(), true);
     }
 
-    /**
-     * Egyszerű pénzfelvétel a számláról, ha van rá fedezet.
-     */
     public void withdraw(String username, double amount) {
         if (amount <= 0) return;
 
@@ -83,10 +69,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    /**
-     * Utalás egy másik felhasználónak, akár azonnal akár ütemezetten.
-     * scheduledDate == null vagy múltbeli dátum => azonnali.
-     */
     public void transfer(String fromUsername,
                          String toAccountNumber,
                          double amount,
@@ -104,7 +86,6 @@ public class UserService implements UserDetailsService {
         boolean immediate = scheduledDate == null
                 || scheduledDate.isBefore(LocalDateTime.now());
         if (immediate && fromUser.getAccountBalance() >= amount) {
-            // azonnali átutalás
             fromUser.setAccountBalance(fromUser.getAccountBalance() - amount);
             toUser.setAccountBalance(toUser.getAccountBalance() + amount);
             userRepository.save(fromUser);
@@ -117,16 +98,12 @@ public class UserService implements UserDetailsService {
                     "Beérkező utalás ettől: " + fromUser.getAccountNumber(),
                     LocalDateTime.now(), true);
         } else {
-            // ütemezett utalás
             saveTransaction(fromUser, "transfer", amount,
                     "Ütemezett utalás erre: " + toUser.getAccountNumber(),
                     scheduledDate, false);
         }
     }
 
-    /**
-     * Egy korábban mentett, de még végre nem hajtott tranzakció törlése.
-     */
     public void cancelScheduledTransaction(Long transactionId, String username) {
         User user = findByUsername(username);
         transactionRepository.findByIdAndUser(transactionId, user)
@@ -134,9 +111,6 @@ public class UserService implements UserDetailsService {
                 .ifPresent(transactionRepository::delete);
     }
 
-    /**
-     * Ütemezett tranzakció dátumának módosítása.
-     */
     public void updateScheduledTransaction(Long transactionId,
                                            String username,
                                            LocalDateTime newDate) {
@@ -145,9 +119,6 @@ public class UserService implements UserDetailsService {
         transactionRepository.save(tx);
     }
 
-    /**
-     * Visszaad egy még ki nem végrehajtott, azonosított tranzakciót.
-     */
     public Transaction getScheduledTransaction(Long id, String username) {
         User user = findByUsername(username);
         return transactionRepository.findByIdAndUser(id, user)
@@ -155,18 +126,11 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("Nem szerkeszthető tranzakció"));
     }
 
-    /**
-     * Periódikusan futtatott ellenőrzés, delegál az executeScheduledTransactions()-nek.
-     */
     @Scheduled(fixedRate = 60_000)
     public void checkAndExecuteScheduledTransactions() {
         executeScheduledTransactions();
     }
 
-    /**
-     * Betölti a lejárt, még nem végrehajtott tranzakciókat,
-     * és ha van fedezet, végrehajtja őket.
-     */
     public void executeScheduledTransactions() {
         List<Transaction> pending = transactionRepository.findAll().stream()
                 .filter(tx -> !tx.isExecuted()
@@ -200,9 +164,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    /**
-     * Segédmetódus az összes tranzakció mentésére.
-     */
     private void saveTransaction(User user,
                                  String type,
                                  double amount,
@@ -220,25 +181,16 @@ public class UserService implements UserDetailsService {
         transactionRepository.save(tx);
     }
 
-    /**
-     * Visszaadja a felhasználó összes tranzakcióját dátum szerint csökkenő sorrendben.
-     */
     public List<Transaction> getTransactionsForUser(String username) {
         User user = findByUsername(username);
         return transactionRepository.findByUserOrderByDateDesc(user);
     }
 
-    /**
-     * Visszaadja a felhasználó függőben lévő, még nem végrehajtott ütemezett tranzakcióit.
-     */
     public List<Transaction> getPendingScheduledTransactions(String username) {
         User user = findByUsername(username);
         return transactionRepository.findByUserAndExecutedFalseOrderByScheduledDateAsc(user);
     }
 
-    /**
-     * Felhasználó betöltése felhasználónév alapján, hibára dob, ha nincs meg.
-     */
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(
@@ -256,10 +208,6 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    /**
-     * Egyszerű mentő metódus unit tesztekhez:
-     * visszatér a repository-tól kapott felhasználóval.
-     */
     public User save(User sampleUser) {
         return userRepository.save(sampleUser);
     }
