@@ -126,7 +126,6 @@ class UserServiceTest {
 
         userService.transfer("u3", "ACC4", 100.0, futureDate);
 
-        // For scheduled transfer, immediate balances unchanged
         assertEquals(500.0, from.getAccountBalance());
         assertEquals(200.0, to.getAccountBalance());
         verify(transactionRepository, times(1)).save(argThat(tx ->
@@ -193,7 +192,6 @@ class UserServiceTest {
     }
     @Test
     void testExecuteScheduledTransactions_successful() {
-        // előkészítés
         User from = new User();
         from.setAccountNumber("ACC1");
         from.setAccountBalance(200.0);
@@ -206,24 +204,20 @@ class UserServiceTest {
         tx.setUser(from);
         tx.setAmount(100.0);
         tx.setExecuted(false);
-        tx.setScheduledDate(LocalDateTime.now().minusMinutes(5)); // már lejárt
+        tx.setScheduledDate(LocalDateTime.now().minusMinutes(5));
         tx.setDescription("Ütemezett utalás erre: ACC2");
 
         when(transactionRepository.findAll()).thenReturn(List.of(tx));
         when(userRepository.findAll()).thenReturn(Arrays.asList(from, to));
 
-        // a metódus meghívása
         userService.executeScheduledTransactions();
 
-        // állapotellenőrzés
         assertTrue(tx.isExecuted(), "A tranzakciónak executed=true kell legyen.");
         assertEquals(100.0, from.getAccountBalance(), 1e-6, "fromUser egyenlege csökkenjen.");
         assertEquals(150.0, to.getAccountBalance(), 1e-6, "toUser egyenlege nőjön.");
 
-        // mentési hívások ellenőrzése
         verify(userRepository).save(from);
         verify(userRepository).save(to);
-        // egyszer menti az incoming tranzakciót és egyszer a meglévő tx-et
         verify(transactionRepository, times(2)).save(any(Transaction.class));
     }
 }
