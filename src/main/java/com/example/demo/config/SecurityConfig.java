@@ -30,9 +30,7 @@ public class SecurityConfig {
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .permitAll()
                 )
-                // Új forma a frameOptions kikapcsolásához
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                // CSRF kikapcsolása a H2 konzolhoz
                 .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")));
 
         return http.build();
