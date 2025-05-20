@@ -23,36 +23,6 @@ jobs:
       - name: Build and Test with Checkstyle skip
         run: mvn -B verify
 
-      - name: Mock DB Setup (ArrayList-based)
-        run: |
-          echo "In-memory mock DB használata: az alkalmazás tesztjei már használhatnak ArrayList alapú adattárolást"
-          mkdir -p src/test/java/org/example/to_dolist/mockdb
-          cat <<EOT > src/test/java/org/example/to_dolist/mockdb/MockTaskDB.java
-          package org.example.to_dolist.mockdb;
-
-          import org.example.to_dolist.domain.Task;
-          import java.util.ArrayList;
-          import java.util.List;
-          import java.util.UUID;
-
-          public class MockTaskDB {
-              private List<Task> tasks = new ArrayList<>();
-
-              public void addTask(Task task) {
-                  tasks.add(task);
-              }
-
-              public Task getTaskById(UUID id) {
-                  return tasks.stream().filter(t -> t.getId().equals(id)).findFirst().orElse(null);
-              }
-
-              public List<Task> getAllTasks() {
-                  return tasks;
-              }
-          }
-          EOT
-          echo "Mock adatbázis osztály létrehozva."
-
       - name: Run tests with mock DB
         run: mvn test
 
